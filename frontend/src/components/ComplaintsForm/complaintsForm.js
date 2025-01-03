@@ -29,7 +29,7 @@ const ComplaintForm = () => {
     setErrorMessage("");
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/complaints/",
+        "https://complaint-management-system-1.onrender.com/api/complaints/",
         formData,
         {
           headers: {

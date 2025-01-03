@@ -15,7 +15,7 @@ const UserComplaints = () => {
       setErrorMessage("");
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/complaints/userComplaints",
+          "https://complaint-management-system-1.onrender.com/api/complaints/userComplaints",
           {
             headers: {
               authorization: `Bearer ${userInfo.token}`,

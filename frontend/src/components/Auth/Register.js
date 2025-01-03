@@ -26,7 +26,7 @@ const Register = () => {
     setErrorMessage("");
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/user/register",
+        "https://complaint-management-system-1.onrender.com/api/user/register",
         formData
       );
       if (response.status === 201) {

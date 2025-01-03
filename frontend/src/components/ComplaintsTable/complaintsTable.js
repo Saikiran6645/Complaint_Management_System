@@ -26,7 +26,7 @@ const ComplaintTable = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/complaints/",
+          "https://complaint-management-system-1.onrender.com/api/complaints/",
           {
             headers: {
               Authorization: `Bearer ${userInfo.token}`,
@@ -107,7 +107,7 @@ const ComplaintTable = () => {
     setErrorMessage("");
     try {
       await axios.put(
-        `http://localhost:5000/api/complaints/${editComplaint._id}`,
+        `https://complaint-management-system-1.onrender.com/api/complaints/${editComplaint._id}`,
         {
           status: editStatus,
         },
@@ -120,7 +120,7 @@ const ComplaintTable = () => {
 
       setEditComplaint(null);
       const response = await axios.get(
-        "http://localhost:5000/api/complaints/",
+        "https://complaint-management-system-1.onrender.com/api/complaints/",
         {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
@@ -143,11 +143,14 @@ const ComplaintTable = () => {
     setSuccessMessage("");
     setErrorMessage("");
     try {
-      await axios.delete(`http://localhost:5000/api/complaints/${id}`, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
+      await axios.delete(
+        `https://complaint-management-system-1.onrender.com/api/complaints/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+      );
       setComplaints(complaints.filter((complaint) => complaint._id !== id));
       setSuccessMessage("Complaint deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 2000); // Clear success message after 2 seconds
