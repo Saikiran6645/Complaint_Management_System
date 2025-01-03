@@ -21,7 +21,7 @@ const NavigationBar = () => {
       </div>
       <ul className="navbar-links">
         {/* Conditionally render links based on the user's role */}
-        {userInfo?.role === "user" && (
+        {userInfo?.role === "User" && (
           <>
             <li>
               <Link to="/">Raise Complaint</Link>
@@ -31,6 +31,10 @@ const NavigationBar = () => {
             </li>
           </>
         )}
+        <li>
+          <div>Username: {userInfo.username}</div>
+          <div>Role: {userInfo.role}</div>
+        </li>
         <li>
           <button onClick={handleLogout} className="logout-button">
             Logout

@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import "./style.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const Login = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isError, setIsError] = useState("");
   const navigate = useNavigate();
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -17,8 +19,10 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
-      // Replace with your backend API endpoint for user registration
       const response = await axios.post(
         "http://localhost:5000/api/user/login",
         loginData
@@ -30,24 +34,28 @@ const Login = () => {
         });
 
         localStorage.setItem("userInfo", JSON.stringify(response.data));
-        setIsSuccess(true);
-        if (response.data.role === "admin") {
+
+        if (response.data.role === "Admin") {
           navigate("/complaints");
         } else {
           navigate("/");
         }
+        setSuccessMessage("Login successful!");
       }
     } catch (error) {
-      setIsError(error.response.data.message);
+      setErrorMessage(error.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div>
-      {isSuccess && <p>Login successful</p>}
-
       <h2>Login</h2>
+
       <form onSubmit={handleSubmit}>
+        {successMessage && <p className="success-message">{successMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <input
           type="email"
           name="email"
@@ -64,7 +72,9 @@ const Login = () => {
           onChange={handleChange}
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
         <p>
           <Link to={"/register"}>Don't have an account?</Link>
         </p>

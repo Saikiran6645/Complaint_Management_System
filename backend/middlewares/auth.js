@@ -18,14 +18,14 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin")
+  if (req.user.role !== "Admin")
     return res
       .status(403)
       .json({ message: "Access denied only Admin can access " });
   next();
 };
 const isUser = (req, res, next) => {
-  if (req.user.role !== "user")
+  if (req.user.role !== "User")
     return res
       .status(403)
       .json({ message: "Access denied only User can access " });

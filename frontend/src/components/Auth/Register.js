@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import "./style.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    role: "user", // Default role
+    role: "User", // Default role
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,25 +21,31 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
-      // Replace with your backend API endpoint for user registration
       const response = await axios.post(
         "http://localhost:5000/api/user/register",
         formData
       );
       if (response.status === 201) {
-        alert("Registration successful");
+        setSuccessMessage("Registration successful! Redirecting to login...");
         setFormData({
           username: "",
           email: "",
           password: "",
-          role: "user",
+          role: "User",
         });
-        navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000); // Navigate after 2 seconds to show the success message
       }
     } catch (error) {
       console.error("Error submitting form:", error.response.data.message);
-      alert(error.response.data.message);
+      setErrorMessage(error.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,6 +53,8 @@ const Register = () => {
     <div>
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
+        {successMessage && <p className="success-message">{successMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
         <input
           type="text"
           name="username"
@@ -72,8 +84,8 @@ const Register = () => {
             <input
               type="radio"
               name="role"
-              value="user"
-              checked={formData.role === "user"}
+              value="User"
+              checked={formData.role === "User"}
               onChange={handleChange}
             />
             User
@@ -82,15 +94,17 @@ const Register = () => {
             <input
               type="radio"
               name="role"
-              value="admin"
+              value="Admin"
               onChange={handleChange}
             />
             Admin
           </label>
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Registering..." : "Register"}
+        </button>
         <p>
-          <Link to={"/login"}>already have an account?</Link>
+          <Link to={"/login"}>Already have an account?</Link>
         </p>
       </form>
     </div>

@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./complaintsTable.css";
+import NavigationBar from "../NavBar/NavigatorBar";
 
 const ComplaintTable = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
   const [complaints, setComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [editComplaint, setEditComplaint] = useState(null);
   const [editStatus, setEditStatus] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Filter states
   const [filterCategory, setFilterCategory] = useState("");
@@ -18,9 +23,24 @@ const ComplaintTable = () => {
 
   useEffect(() => {
     const fetchComplaints = async () => {
-      const response = await axios.get("http://localhost:5000/api/complaints/");
-      setComplaints(response.data);
-      setFilteredComplaints(response.data); // Initialize filtered complaints
+      setIsLoading(true);
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/complaints/",
+          {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+          }
+        );
+        setComplaints(response.data);
+        setFilteredComplaints(response.data); // Initialize filtered complaints
+      } catch (error) {
+        setErrorMessage(error.response.data.message);
+        setTimeout(() => setErrorMessage(""), 2000); // Clear error message after 2 seconds
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchComplaints();
   }, []);
@@ -82,6 +102,9 @@ const ComplaintTable = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
       await axios.put(
         `http://localhost:5000/api/complaints/${editComplaint._id}`,
@@ -96,14 +119,29 @@ const ComplaintTable = () => {
       );
 
       setEditComplaint(null);
-      const response = await axios.get("http://localhost:5000/api/complaints/");
+      const response = await axios.get(
+        "http://localhost:5000/api/complaints/",
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        }
+      );
       setComplaints(response.data);
+      setSuccessMessage("Complaint status updated successfully!");
+      setTimeout(() => setSuccessMessage(""), 2000); // Clear success message after 2 seconds
     } catch (error) {
-      alert("Error updating complaint status");
+      setErrorMessage(error.response.data.message);
+      setTimeout(() => setErrorMessage(""), 2000); // Clear error message after 2 seconds
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
       await axios.delete(`http://localhost:5000/api/complaints/${id}`, {
         headers: {
@@ -111,8 +149,13 @@ const ComplaintTable = () => {
         },
       });
       setComplaints(complaints.filter((complaint) => complaint._id !== id));
+      setSuccessMessage("Complaint deleted successfully!");
+      setTimeout(() => setSuccessMessage(""), 2000); // Clear success message after 2 seconds
     } catch (error) {
-      alert(error.response.data.message);
+      setErrorMessage(error.response.data.message);
+      setTimeout(() => setErrorMessage(""), 2000); // Clear error message after 2 seconds
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -122,6 +165,7 @@ const ComplaintTable = () => {
 
   return (
     <>
+      {userInfo ? <NavigationBar /> : " "}
       <div className="filters">
         <label>
           Category:
@@ -176,6 +220,10 @@ const ComplaintTable = () => {
           />
         </label>
       </div>
+
+      {isLoading && <p className="loading-message">Loading...</p>}
+      {successMessage && <p className="success-message">{successMessage}</p>}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
 
       <table className="complaint-table">
         <thead>
@@ -247,8 +295,12 @@ const ComplaintTable = () => {
                   <option value="Resolved">Resolved</option>
                 </select>
               </label>
-              <button type="submit" className="submit-button">
-                Update Status
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isLoading}
+              >
+                {isLoading ? "Updating..." : "Update Status"}
               </button>
             </form>
           </div>
