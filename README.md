@@ -33,7 +33,7 @@ A web application for users to submit complaints and for administrators to manag
 ### Setup  
 1. Clone the repository:  
    ```bash  
-   git clone https://github.com/yourusername/complaint-management-system.git  
+   git clone https://github.com/Saikiran6645/Complaint_Management_System.git  
    cd complaint-management-system
 
 ## Install dependencies for the backend and frontend:
